@@ -1,8 +1,7 @@
 <?php include "templates/include/header.php" ?>
 
       <div id="adminHeader">
-        <h2>Widget News Admin</h2>
-        <p>You are logged in as <b><?php echo htmlspecialchars( $_SESSION['username']) ?></b>. <a href="admin.php?action=logout"?>Log out</a></p>
+        <h2>WebVidz Admin</h2>
       </div>
 
       <h1><?php echo $results['pageTitle']?></h1>
@@ -22,18 +21,43 @@
           </li>
 
           <li>
-            <label for="summary">Movie Summary</label>
-            <textarea name="summary" id="summary" placeholder="Brief description of the movie" required maxlength="1000" style="height: 5em;"><?php echo htmlspecialchars( $results['movie']->summary )?></textarea>
+            <label for="synopsis">Movie Summary</label>
+            <textarea name="synopsis" id="synopsis" placeholder="Brief description of the movie" required maxlength="1000" style="height: 5em;"><?php echo htmlspecialchars( $results['movie']->synopsis )?></textarea>
           </li>
 
           <li>
-            <label for="content">Movie Content</label>
-            <textarea name="content" id="content" placeholder="The HTML content of the movie" required maxlength="100000" style="height: 30em;"><?php echo htmlspecialchars( $results['movie']->content )?></textarea>
+            <label for="poster">Movie Poster (URL to Image)</label>
+            <input type="text" name="poster" id="poster" placeholder="Poster of the movie" required autofocus maxlength="255" value="<?php echo htmlspecialchars( $results['movie']->poster )?>" />
           </li>
 
           <li>
-            <label for="publicationDate">Publication Date</label>
-            <input type="date" name="publicationDate" id="publicationDate" placeholder="YYYY-MM-DD" required maxlength="10" value="<?php echo $results['movie']->publicationDate ? date( "Y-m-d", $results['movie']->publicationDate ) : "" ?>" />
+            <label for="trailer">Movie Trailer (Embed Video Link)</label>
+            <input type="text" name="trailer" id="trailer" placeholder="Trailer of the movie" required autofocus maxlength="255" value="<?php echo htmlspecialchars( $results['movie']->trailer )?>" />
+          </li>
+
+          <li>
+            <label for="director">Movie Director</label>
+            <input type="text" name="director" id="director" placeholder="Director of the movie" required autofocus maxlength="255" value="<?php echo htmlspecialchars( $results['movie']->director )?>" />
+          </li>
+
+          <li>
+            <label for="genre">Movie Genre</label>
+            <select name="genre" id="genre">
+              <option value="action">Action</option>
+              <option value="comedy">Comedy</option>
+              <option value="drama">Drama</option>
+              <option value="documentary">Documentary</option>
+            </select>
+          </li>
+
+          <li>
+            <label for="rating">Movie Rating</label>
+            <input type="number" min="1" max="5" name="rating" id="rating" placeholder="Rating of the movie" required autofocus maxlength="255" value="<?php echo htmlspecialchars( $results['movie']->rating )?>" />
+          </li>
+
+          <li>
+            <label for="releaseyear">Release Year</label>
+            <input type="number" min="1950" max="2020" name="releaseyear" id="releaseyear" placeholder="YYYY" required maxlength="10" value="<?php echo $results['movie']->releaseyear ?>" />
           </li>
 
 

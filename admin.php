@@ -3,7 +3,6 @@
 require( "config.php" );
 session_start();
 $action = isset( $_GET['action'] ) ? $_GET['action'] : "";
-$username = isset( $_SESSION['username'] ) ? $_SESSION['username'] : "";
 
 switch ( $action ) {
   case 'newMovie':
@@ -16,7 +15,7 @@ switch ( $action ) {
     deleteMovie();
     break;
   default:
-    listMovies();
+    newMovie();
 }
 
 
@@ -90,26 +89,6 @@ function deleteMovie() {
 
   $movie->delete();
   header( "Location: admin.php?status=movieDeleted" );
-}
-
-
-function listMovies() {
-  $results = array();
-  $data = Movie::getList();
-  $results['movies'] = $data['results'];
-  $results['totalRows'] = $data['totalRows'];
-  $results['pageTitle'] = "All Movies";
-
-  if ( isset( $_GET['error'] ) ) {
-    if ( $_GET['error'] == "movieNotFound" ) $results['errorMessage'] = "Error: Movie not found.";
-  }
-
-  if ( isset( $_GET['status'] ) ) {
-    if ( $_GET['status'] == "changesSaved" ) $results['statusMessage'] = "Your changes have been saved.";
-    if ( $_GET['status'] == "movieDeleted" ) $results['statusMessage'] = "Movie deleted.";
-  }
-
-  require( TEMPLATE_PATH . "/admin/listMovies.php" );
 }
 
 ?>

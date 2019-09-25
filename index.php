@@ -7,6 +7,9 @@ switch ( $action ) {
   case 'viewMovie':
   viewMovie();
     break;
+  case 'viewGenre':
+  viewGenre();
+    break;
   default:
     homepage();
 }
@@ -19,8 +22,22 @@ function viewMovie() {
 
   $results = array();
   $results['movie'] = Movie::getById( (int)$_GET["movieId"] );
-  $results['pageTitle'] = $results['movie']->title . " | Widget News";
+  $results['pageTitle'] = $results['movie']->title . " | WebVidz";
   require( TEMPLATE_PATH . "/viewMovie.php" );
+}
+
+function viewGenre() {
+  if ( !isset($_GET["genre"]) || !$_GET["genre"] ) {
+    homepage();
+    return;
+  }
+
+  $results = array();
+  $data = Movie::getListByGenre($_GET["genre"]);
+  $results['movies'] = $data['results'];
+  $results['totalRows'] = $data['totalRows'];
+  $results['pageTitle'] = $_GET["genre"] . " Movies";
+  require( TEMPLATE_PATH . "/homepage.php" );
 }
 
 function homepage() {
@@ -28,7 +45,7 @@ function homepage() {
   $data = Movie::getList();
   $results['movies'] = $data['results'];
   $results['totalRows'] = $data['totalRows'];
-  $results['pageTitle'] = "Widget News";
+  $results['pageTitle'] = "WebVidz Homepage";
   require( TEMPLATE_PATH . "/homepage.php" );
 }
 

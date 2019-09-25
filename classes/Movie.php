@@ -50,6 +50,11 @@ class Movie
   public $rating = null;
 
   /**
+  * @var string The HTML content of the movie
+  */
+  public $releaseyear = null;
+
+  /**
   * Sets the object's properties using the values in the supplied array
   *
   * @param assoc The property values
@@ -57,13 +62,15 @@ class Movie
 
   public function __construct( $data=array() ) {
     if (isset( $data['id'])) $this->id = (int) $data['id'];
-    if ( isset( $data['title'] ) ) $this->content = $data['title'];
-    if ( isset( $data['synopsis'] ) ) $this->content = $data['synopsis'];
-    if ( isset( $data['poster'] ) ) $this->content = $data['poster'];
-    if ( isset( $data['trailer'] ) ) $this->content = $data['trailer'];
-    if ( isset( $data['director'] ) ) $this->content = $data['director'];
-    if ( isset( $data['genre'] ) ) $this->content = $data['genre'];
+    if ( isset( $data['title'] ) ) $this->title = $data['title'];
+    if ( isset( $data['synopsis'] ) ) $this->synopsis = $data['synopsis'];
+    if ( isset( $data['poster'] ) ) $this->poster = $data['poster'];
+    if ( isset( $data['trailer'] ) ) $this->trailer = $data['trailer'];
+    if ( isset( $data['director'] ) ) $this->director = $data['director'];
+    if ( isset( $data['genre'] ) ) $this->genre = $data['genre'];
     if ( isset( $data['rating'] ) ) $this->rating = (int) $data['rating'];
+    if ( isset( $data['releaseyear'] ) ) $this->releaseyear = (int) $data['releaseyear'];
+
   }
 
 
@@ -78,15 +85,6 @@ class Movie
     // Store all the parameters
     $this->__construct( $params );
 
-    // Parse and store the publication date
-    if ( isset($params['publicationDate']) ) {
-      $publicationDate = explode ( '-', $params['publicationDate'] );
-
-      if ( count($publicationDate) == 3 ) {
-        list ( $y, $m, $d ) = $publicationDate;
-        $this->publicationDate = mktime ( 0, 0, 0, $m, $d, $y );
-      }
-    }
   }
 
 
@@ -116,13 +114,33 @@ class Movie
   * @return Array|false A two-element array : results => array, a list of movie objects; totalRows => Total number of movies
   */
 
-  public static function getList( $numRows=1000000 ) {
+  public static function getList() {
     $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
-    $sql = "SELECT SQL_CALC_FOUND_ROWS * FROM movies
-            ORDER BY id DESC LIMIT :numRows";
+    $sql = "SELECT * FROM movies
+            ORDER BY id DESC";
 
     $st = $conn->prepare( $sql );
-    $st->bindValue( ":numRows", $numRows, PDO::PARAM_INT );
+    $st->execute();
+    $list = array();
+
+    while ( $row = $st->fetch() ) {
+      $movie = new movie( $row );
+      $list[] = $movie;
+    }
+
+    // Now get the total number of movies that matched the criteria
+    $sql = "SELECT FOUND_ROWS() AS totalRows";
+    $totalRows = $conn->query( $sql )->fetch();
+    $conn = null;
+    return ( array ( "results" => $list, "totalRows" => $totalRows[0] ) );
+  }
+
+
+  public static function getListByGenre($genre) {
+    $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
+    $sql = "SELECT * FROM `movies` WHERE `genre` = :genre";
+    $st = $conn->prepare( $sql );
+    $st->bindValue( ":genre", $genre, PDO::PARAM_STR );
     $st->execute();
     $list = array();
 
@@ -150,9 +168,10 @@ class Movie
 
     // Insert the movie
     $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
-    $sql = "INSERT INTO movies ( title, synopsis, poster, trailer, director, genre, rating ) VALUES ( :title, :synopsis, :poster, :trailer, :director, :genre, :rating )";
+    $sql = "INSERT INTO movies ( title, releaseyear, synopsis, poster, trailer, director, genre, rating ) VALUES ( :title, :releaseyear, :synopsis, :poster, :trailer, :director, :genre, :rating )";
     $st = $conn->prepare ( $sql );
     $st->bindValue( ":title", $this->title, PDO::PARAM_STR );
+    $st->bindValue( ":releaseyear", $this->releaseyear, PDO::PARAM_STR );
     $st->bindValue( ":synopsis", $this->synopsis, PDO::PARAM_STR );
     $st->bindValue( ":poster", $this->poster, PDO::PARAM_STR );
     $st->bindValue( ":trailer", $this->trailer, PDO::PARAM_STR );
@@ -177,9 +196,10 @@ class Movie
    
     // Update the movie
     $conn = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
-    $sql = "UPDATE movies SET title=:title, synopsis=:synopsis, poster=:poster, trailer=:trailer, director=:director, genre=:genre, rating=:rating WHERE id = :id";
+    $sql = "UPDATE movies SET title=:title, releaseyear=:releaseyear, synopsis=:synopsis, poster=:poster, trailer=:trailer, director=:director, genre=:genre, rating=:rating WHERE id = :id";
     $st = $conn->prepare ( $sql );
     $st->bindValue( ":title", $this->title, PDO::PARAM_STR );
+    $st->bindValue( ":releaseyear", $this->releaseyear, PDO::PARAM_STR );
     $st->bindValue( ":synopsis", $this->synopsis, PDO::PARAM_STR );
     $st->bindValue( ":poster", $this->poster, PDO::PARAM_STR );
     $st->bindValue( ":trailer", $this->trailer, PDO::PARAM_STR );
